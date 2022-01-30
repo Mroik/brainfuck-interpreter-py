@@ -1,3 +1,6 @@
+import argparse
+
+
 class Interpreter:
     def __init__(self):
         self.memory = list()
@@ -22,6 +25,8 @@ class Interpreter:
             match instruction:
                 case ('>' | '<' | '+' | '-' | '.' | '|' | '[' | ']'):
                     self.program.append(str(instruction))
+        if len(self.program) == 0:
+            raise ValueError("No program was present in the string")
         self.ready = True
 
     def _increment_pointer(self) -> None:
@@ -78,24 +83,20 @@ class Interpreter:
         Instruction '['
         """
         if self.memory[self.data_pointer] == 0:
-            while True:
+            while self.program[self.program_pointer] != ']':
                 self.program_pointer += 1
                 if self.program_pointer >= len(self.program):
                     raise RuntimeError("The program is not correctly written")
-                if self.program[self.program_pointer] == ']':
-                    break
 
     def _right_conditional(self) -> None:
         """
         Instruction ']'
         """
         if self.memory[self.data_pointer] != 0:
-            while True:
+            while self.program[self.program_pointer] != '[':
                 self.program_pointer -= 1
                 if self.program_pointer <= 0:
                     raise RuntimeError("The program is not correctly written")
-                if self.program[self.program_pointer] == '[':
-                    break
 
     def _fetch_execute(self) -> bool:
         self._instructions[self.program[self.program_pointer]]()
@@ -118,3 +119,20 @@ class Interpreter:
         for x in self.program:
             print(f"\t{x}")
         print(f"Program pointer: {self.program_pointer}")
+
+
+def main(args):
+    inter = Interpreter()
+    if args.program:
+        with open(args.program, "r") as fd:
+            prog = fd.read()
+    else:
+        prog = input()
+    inter.load_program(prog)
+    inter.start()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("program", nargs="?", help="The file containing the program")
+    main(parser.parse_args())
