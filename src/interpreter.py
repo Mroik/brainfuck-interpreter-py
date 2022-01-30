@@ -17,13 +17,12 @@ class Interpreter:
             "]": self._right_conditional,
         }
 
-    def load_program(self, program: str) -> bool:
+    def load_program(self, program: str) -> None:
         for instruction in program:
             match instruction:
                 case ('>' | '<' | '+' | '-' | '.' | '|' | '[' | ']'):
                     self.program.append(str(instruction))
         self.ready = True
-        return True
 
     def _increment_pointer(self) -> None:
         """

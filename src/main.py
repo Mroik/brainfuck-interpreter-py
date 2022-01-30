@@ -10,9 +10,7 @@ def main(args):
             prog = fd.read()
     else:
         prog = input()
-    if not inter.load_program(prog):
-        print("Error, check your program")
-        return
+    inter.load_program(prog)
     inter.start()
 
 
