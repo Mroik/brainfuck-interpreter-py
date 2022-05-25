@@ -1,4 +1,18 @@
 import argparse
+import tty
+import termios
+from sys import stdin
+
+
+def get_char():
+    fd = stdin.fileno()
+    oldy = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd, termios.TCSADRAIN)
+        ch = stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, oldy)
+    return ch
 
 
 class Interpreter:
@@ -23,7 +37,7 @@ class Interpreter:
     def load_program(self, program: str) -> None:
         for instruction in program:
             match instruction:
-                case ('>' | '<' | '+' | '-' | '.' | '|' | '[' | ']'):
+                case ('>' | '<' | '+' | '-' | '.' | ',' | '[' | ']'):
                     self.program.append(str(instruction))
         if len(self.program) == 0:
             raise ValueError("No program was present in the string")
@@ -67,13 +81,13 @@ class Interpreter:
         """
         Instruction '.'
         """
-        print(chr(self.memory[self.data_pointer]), end="")
+        print(chr(self.memory[self.data_pointer]), end="", flush=True)
 
     def _scan_data(self) -> None:
         """
         Instruction ','
         """
-        char_read = ord(input()[0])
+        char_read = ord(get_char())
         if char_read > 255 or char_read < 0:
             raise ValueError("Can read only ASCII characters")
         self.memory[self.data_pointer] = char_read
