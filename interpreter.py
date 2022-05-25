@@ -141,7 +141,8 @@ def main(args):
         with open(args.program, "r") as fd:
             prog = fd.read()
     else:
-        prog = input()
+        print("You need to pass a file to read from")
+        return
     inter.load_program(prog)
     inter.start()
 
