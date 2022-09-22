@@ -107,7 +107,16 @@ class Interpreter:
         Instruction ']'
         """
         if self.memory[self.data_pointer] != 0:
-            while self.program[self.program_pointer] != '[':
+            counter = 0
+            self.program_pointer -= 1
+
+            while True:
+                if self.program[self.program_pointer] == '[':
+                    if counter == 0:
+                        break
+                    counter -= 1
+                elif self.program[self.program_pointer] == ']':
+                    counter += 1
                 self.program_pointer -= 1
                 if self.program_pointer <= 0:
                     raise RuntimeError("The program is not correctly written")
